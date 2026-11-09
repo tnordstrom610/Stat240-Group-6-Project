@@ -1,0 +1,126 @@
+# College ROI Data — what U.S. colleges and majors actually pay back
+
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21351602-1682D4?style=flat-square)](https://doi.org/10.5281/zenodo.21351602)
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-b31b1b?style=flat-square)](https://creativecommons.org/licenses/by/4.0/)
+[![Website](https://img.shields.io/badge/site-le--teen.com-111?style=flat-square)](https://le-teen.com)
+[![Methodology](https://img.shields.io/badge/methodology-public-111?style=flat-square)](https://le-teen.com/methodology)
+
+Clean, citable tables on the **lifetime financial return of U.S. colleges and majors** —
+30-year net present value by school and state, ROI by major category, the out-of-state
+premium, and how exposed each major's career paths are to today's AI. Maintained by
+**[LE TEEN](https://le-teen.com)**, a college-ROI data project. Every number traces to a
+public source; nothing is scraped, modeled behind closed doors, or vibes.
+
+The headline the data mints: **picking a major swings mean lifetime ROI by ~$1.24M**
+(Engineering **+$1,132,553** vs Philosophy & Religious Studies **−$111,915**, cohort-weighted
+mean lifetime ROI, FREOPP 2021) — and in several popular major categories the **majority of
+graduates never break even**. Weeks get spent on campus tours; the number that decides the
+next 30 years gets minutes. These tables exist so it can get cited instead.
+
+> **CC BY 4.0** — quote a figure, build on it, cite the source. Free for journalism,
+> research, and answer engines.
+
+## What's inside
+
+| File | Rows | What it is |
+|---|---:|---|
+| `roi-by-major-category.csv` | 19 | Cohort-weighted lifetime ROI per major category: mean/median, p25/p75 spread, % of graduates who never break even, % whose 30-year ROI is below zero (a strictly wider group — it also counts degrees that pay off only in the graduate's late fifties), median breakeven age, completion-adjusted + dropout ROI |
+| `best-value-colleges-by-state.csv` | 607 | Top institutions per U.S. state by 30-year NPV for a resident student |
+| `out-of-state-penalty.csv` | 455 | The 30-year NPV cost of attending each public flagship/university as a non-resident vs resident, with both tuition rows. 445 of the 455 admit freshmen; see [the out-of-state file](#the-out-of-state-file-455-rows-445-freshman-admitting) for the four columns that say which |
+| `ai-exposure-by-major.csv` | 18 | LE TEEN-derived AI applicability score per major category (occupation-weighted; **exposure, not displacement**) |
+| `institutions.csv` | 3,392 | IPEDS 2023-24 join table: UnitID, name, location, control, level, tuition (in/out-of-state), room & board, median earnings where published |
+
+### The out-of-state file: 455 rows, 445 freshman-admitting
+
+`out-of-state-penalty.csv` covers 455 public universities. Ten of them are
+graduate/professional or health-science campuses that do not admit first-time freshmen
+(University of Maryland, Baltimore; University of Nebraska Medical Center; and eight others).
+LE TEEN leaves those ten out of the named rankings it publishes on le-teen.com, because a
+ranking a 17-year-old reads should not name a campus they cannot enrol in. That is an
+editorial call, not a data correction: the ten rows stay here with every value unchanged,
+and four columns, appended after the original eight so a positional parser still reads,
+make both views derivable from this one file:
+
+| Column | What it holds |
+|---|---|
+| `unitid` | IPEDS UnitID, the join key to `institutions.csv` |
+| `admits_freshmen` | `true`, or `false` for the ten campuses that do not admit freshmen |
+| `excluded_from_named_rankings_reason` | empty, or `no-freshman-admission` |
+| `rank_freshman_admitting` | rank 1..445 over the freshman-admitting rows (the ranking le-teen.com publishes); empty for the ten |
+
+`rank` is unchanged and still runs 1..455 over every row of this file, the ten included. Filter on `admits_freshmen == true` and
+sort by `rank_freshman_admitting` to reproduce the published list.
+
+## Quickstart
+
+```python
+import pandas as pd
+majors = pd.read_csv("roi-by-major-category.csv")
+majors.nlargest(5, "mean_lifetime_roi_usd")[["major_category", "mean_lifetime_roi_usd", "pct_never_breakeven"]]
+```
+
+Interactive versions of every table live at
+[le-teen.com/rankings](https://le-teen.com/rankings) and the per-major pages at
+[le-teen.com/majors](https://le-teen.com/majors); the calculator that joins them is
+[le-teen.com/worth-it](https://le-teen.com/worth-it).
+
+## Sources & method
+
+Full write-up: **[le-teen.com/methodology](https://le-teen.com/methodology)**.
+
+| Source | Used for | License |
+|---|---|---|
+| [FREOPP](https://freopp.org/projects/higher-education/) higher-ed ROI (2021 publication, ~30,000 bachelor's programs; earnings from College Scorecard cohorts 2015–17, 2022 dollars, 3% real discount rate) | Program-level lifetime ROI, aggregated by LE TEEN to major categories and institutions | CC BY 4.0 |
+| [NCES IPEDS](https://nces.ed.gov/ipeds/) 2023-24 Final | Institution identity, tuition & fees, room & board | U.S. public domain |
+| [BEA Regional Price Parities](https://www.bea.gov/data/prices-inflation/regional-price-parities-state-and-metro-area) (2023) | Cost-of-living adjustment in NPV calculations | U.S. public domain |
+| Microsoft Research ["Working with AI"](https://arxiv.org/abs/2507.07935) (2025), [Anthropic Economic Index](https://huggingface.co/datasets/Anthropic/EconomicIndex) (2025-09-15), Census ACS 2022 PUMS + NCES/Census crosswalks | AI-exposure score per major | CC BY 4.0 / CC BY / public domain |
+
+**Modification notice (CC BY 4.0 §3):** the per-major ROI aggregates, per-institution
+30-year NPV figures, out-of-state deltas, and AI-exposure scores are **LE TEEN-derived**
+from the sources above (cohort weighting, CIP→SOC crosswalks, NPV joins) — they are not
+original FREOPP, Microsoft, Anthropic, or federal figures. The AI metric measures how much
+of a field's work current AI is *observed reaching for* — Microsoft Research explicitly
+disclaims a job-loss reading, and so do we.
+
+**Vintage disclosure:** ROI earnings derive from FREOPP's 2021 publication (the newest with
+a public download); costs are IPEDS 2023-24 Final; deflators BEA 2023. Earnings outcomes
+are intrinsically lagged — cohorts must be 5–8 years post-graduation to observe. Where a
+figure matters, say the vintage.
+
+## Mirrors
+
+The canonical, versioned record is **Zenodo — concept DOI [10.5281/zenodo.21351602](https://doi.org/10.5281/zenodo.21351602)**, which always resolves to the latest version. Cite that, never a pinned version DOI: a pinned DOI freezes to whatever was current when it was written, so a copy of this file inside an archived version would keep pointing at a superseded record forever. The same tables are mirrored for discovery and convenience:
+
+| Surface | Link |
+|---|---|
+| GitHub (this repo) | <https://github.com/thomasthinks/college-roi-data> |
+| Hugging Face | <https://huggingface.co/datasets/le-teen/college-roi-data> |
+| Kaggle | <https://www.kaggle.com/datasets/leteen/college-roi-data> |
+| figshare | <https://doi.org/10.6084/m9.figshare.32988698> |
+| OpenML | current dataset ids at <https://le-teen.com/data> — OpenML datasets are immutable, so a correction means a new id and any number written here goes dead |
+| OSF | <https://osf.io/uy4pz/> |
+
+Cite the Zenodo DOI (see [Cite](#cite)). That mirror list is complete — there is no eighth surface pending.
+
+## Programmatic access
+
+Don't want CSVs? The same numbers are queryable live:
+
+- **JSON API** — free, keyless, CORS-open static JSON at [le-teen.com/api](https://le-teen.com/api): all majors/subfields, the 500 positive-NPV-envelope colleges, and the standing rankings, with an [OpenAPI 3.1 spec](https://le-teen.com/api/v1/openapi.json). Root: `https://le-teen.com/api/v1/index.json`.
+- **MCP server** — the data as native tools for AI agents (Model Context Protocol, stdio): `npx -y college-roi-mcp` ([npm](https://www.npmjs.com/package/college-roi-mcp) · [source](https://github.com/thomasthinks/college-roi-mcp), MIT). On the [official MCP registry](https://registry.modelcontextprotocol.io/v0/servers?search=college-roi) as `com.le-teen/college-roi-mcp` and on [Smithery](https://smithery.ai/servers/tj-r4v3/college-roi-mcp).
+
+Note the scope difference: this dataset covers all 3,392 institutions; the API/MCP college endpoints expose the 500 that clear LE TEEN's positive-NPV editorial envelope (absence there is a coverage statement, not a verdict).
+
+## Cite
+
+> LE TEEN (2026). *College ROI Data: 30-year net present value of U.S. colleges and majors.*
+> Derived from FREOPP (2021), NCES IPEDS (2023-24), BEA RPP (2023). https://le-teen.com/methodology
+
+A `CITATION.cff` ships in this repository; DOI: [10.5281/zenodo.21351602](https://doi.org/10.5281/zenodo.21351602) — the concept DOI, which resolves to the latest version. Version-specific DOIs exist and are listed on the Zenodo record, but cite the concept DOI unless you deliberately need to pin to one release.
+
+## Refresh cadence
+
+Tracks the LE TEEN site data: IPEDS/BEA annually, FREOPP when a new public download
+exists, AI-exposure inputs ~60 days. Each refresh is a tagged release.
+
+*Maintained by [LE TEEN](https://le-teen.com) · press: press@le-teen.com*
