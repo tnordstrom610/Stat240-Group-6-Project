@@ -17,24 +17,55 @@ output: html_document
 
 ## 3. Research Question
 
-Does the mean final Portugese grade differ between students who report lower and higher weekly study time at the two schools in the study?
+Does the mean final Portuguese grade differ between students who report lower and higher weekly study time at the two schools in the study?
 
 ## 4. Data Description
 
 ### 4.1 Data Collection
 
-- Paulo Cortez and Alice Silva compiled data from school reports and questionnaires at two Portugese secondary schools.
+- Paulo Cortez and Alice Silva compiled data from school reports and questionnaires at two Portuguese secondary schools.
 
 ### 4.2 Key Variables
 
 - `studytime` records self-reported weekly study time. We will group categories 1 and 2 as lower study time and categories 3 and 4 as higher study time.
-- `G3` is the final Portugese grade on a 0-20 scale.
+- `G3` is the final Portuguese grade on a 0-20 scale.
 
 ### 4.3 Data Structure and Sample Size
 
-- **One row** represents student's record for the portugest course.
-- **Population of interest** is students taking Portugese at the two schools in the study
+- **One row** represents student's record for the Portuguese course.
+- **Population of interest** is students taking Portuguese at the two schools in the study
 - **Sample size** is 649 students, with 517 in the lower study-time group and 132 in the higher group.
 
 ### 4.4 Data Preview
 
+### 4.4 Data Preview
+
+```{r data-preview, echo=FALSE}
+students = read.csv(
+  "INSERT YOUR LOCAL PATH TO THE `STUDENTS-POR.CSV DATASET HERE",
+  sep = ";"
+)
+
+knitr::kable(
+  head(students[c("studytime", "G3")], 5),
+  col.names = c("Study-time category", "Final Portuguese grade"),
+  caption = "First five student records"
+)
+```
+
+## 5. Graph Description
+
+- **Graph** Side-by-side boxplots iwth a marker for each group's mean.
+- **X-axis** Lower and higher weekly study-time groups.
+- **Y-axis** Final Portuguese grade (0-20).
+
+## 6. Inference Method
+
+We will use a **Welch two-sample $t$-test** to compare mean final grades. The explanatory variable is study-time group, and the response variable is final Portuguese grade.
+
+Let $\mu_H$ and $\mu_L$ be the population mean final grades for the higher and lower study-time groups, respectively.
+
+- $H_0: \mu_H - \mu_L = 0$
+- $H_A: \mu_H - \mu_L \ne 0$
+
+We will report a two-sided p-value and a 95% confidence interval for the difference in mean grades. Because students chose how much to study, we will interpret any difference as an association.
