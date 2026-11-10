@@ -1,6 +1,6 @@
 ---
 title: "Group 6 Proposal"
-author: "Tyler Nordstrom"
+author: "Tyler Nordstrom, Taylor Johnson, Jed Lehrich, Mason Trinkner"
 date: "2026-11-10"
 output: html_document
 ---
