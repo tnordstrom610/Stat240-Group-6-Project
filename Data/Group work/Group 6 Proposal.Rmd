@@ -4,27 +4,37 @@ author: "Tyler Nordstrom"
 date: "2026-11-10"
 output: html_document
 ---
+## 1. Collaboration Plan
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+- **Communication** through an iMessage groupchat
+- **Shared work** through a GitHub repository for data, code, and the proposal
+- **Check-ins** are during weekly discussion time, and throughout the week via our iMessage groupchat
 
-## R Markdown
+## 2. Data Source
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+- [UCI Student Performance Dataset] (https://archive.ics.uci.edu/dataset/320/student+performance)
+- **File used** `student-por.csv`
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+## 3. Research Question
 
-```{r cars}
-summary(cars)
-```
+Does the mean final Portugese grade differ between students who report lower and higher weekly study time at the two schools in the study?
 
-## Including Plots
+## 4. Data Description
 
-You can also embed plots, for example:
+### 4.1 Data Collection
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
+- Paulo Cortez and Alice Silva compiled data from school reports and questionnaires at two Portugese secondary schools.
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+### 4.2 Key Variables
+
+- `studytime` records self-reported weekly study time. We will group categories 1 and 2 as lower study time and categories 3 and 4 as higher study time.
+- `G3` is the final Portugese grade on a 0-20 scale.
+
+### 4.3 Data Structure and Sample Size
+
+- **One row** represents student's record for the portugest course.
+- **Population of interest** is students taking Portugese at the two schools in the study
+- **Sample size** is 649 students, with 517 in the lower study-time group and 132 in the higher group.
+
+### 4.4 Data Preview
+
