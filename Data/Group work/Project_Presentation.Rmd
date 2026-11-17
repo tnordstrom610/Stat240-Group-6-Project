@@ -1,6 +1,6 @@
 ---
 title: "Project Presentation"
-author: "Jed Lehrich"
+author: "Jed Lehrich, Tyler Nordstrom, Taylor Johnson, Mason Trinkner"
 date: "2026-11-17"
 output: html_document
 ---
