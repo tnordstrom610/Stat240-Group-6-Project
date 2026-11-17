@@ -9,22 +9,91 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+Group 6 – Everything Due 11/30
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Overview
+On Monday 11/30 we turn in 3 files as our discussion assignment, then present the knitted HTML in discussion on Tuesday 12/1.
+#
+File
+What it is
+1
+student-por.csv
+The raw data, exactly as downloaded from UCI. Do not edit it.
+2
+cleaning.Rmd
+Reads the raw data and keeps only the columns and rows we use.
+3
+report.html (+ report.Rmd)
+The full knitted report: Introduction, Background, Statistical Analysis, Discussion.
+Goal: everything merged in the GitHub repo by Wed 11/25 so we have Thanksgiving week to polish.
+Step 1: Fix what the TA asked for
+The TA asked us to check group sizes and also compare category 1 against category 4. Do this first, because it changes what goes in the report.
+[ ] Count students in each study-time category (1, 2, 3, 4). Put this table in the report. Category 4 (more than 10 hours a week) is probably small, about 35 students. Confirm the real number.
+[ ] Keep our main test: lower (1+2) vs. higher (3+4), Welch two-sample t-test.
+[ ] Add a second test: category 1 vs. category 4 only, also a Welch t-test. These are the two extremes.
+[ ] Say the small group is less stable. If category 4 is small, mention in the Discussion that the 1 vs. 4 result is less reliable.
+[ ] Check for final grades of 0. A G3 of 0 usually means the student dropped out, not that they scored zero. Count them, decide as a group whether to keep them, and explain the choice in Background.
+Code to start with:
+# how many students in each category
+por_clean %>% count(studytime)
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+# how many final grades of 0
+por_clean %>% filter(G3 == 0) %>% count(study_group)
 
-```{r cars}
-summary(cars)
-```
+# main test: lower vs higher
+t.test(G3 ~ study_group, data = por_clean)
 
-## Including Plots
+# second test: category 1 vs category 4
+extremes <- por_clean %>% filter(studytime %in% c(1, 4))
+t.test(G3 ~ studytime, data = extremes)
+t.test() runs the Welch version by default, so we get the p-value and 95% confidence interval from the same output.
+Step 2: Raw data and cleaning file
+The cleaning file is a separate .Rmd from the report. It reads the raw file, keeps only what we use, and saves a clean copy that the report reads.
+[ ] Put the original student-por.csv in the repo, untouched.
+[ ] Make cleaning.Rmd that keeps only studytime and G3, adds the lower/higher group, and saves por_clean.csv.
+[ ] Knit it once to make sure it runs.
+Watch out: the UCI file is separated by semicolons, not commas, so read_csv() will put everything in one column. Use read_delim().
+library(tidyverse)
 
-You can also embed plots, for example:
+por <- read_delim("student-por.csv", delim = ";")
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
+por_clean <- por %>%
+  select(studytime, G3) %>%
+  mutate(study_group = case_when(
+    studytime %in% c(1, 2) ~ "Lower",
+    studytime %in% c(3, 4) ~ "Higher"
+  ))
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+write_csv(por_clean, "por_clean.csv")
+
+
+If we decide to drop the G3 = 0 students, add filter(G3 > 0) here and say so in the report.
+Step 3: Write the report
+Write it for someone who knows nothing about statistics. Statistical terms go only in the Statistical Analysis section.
+Introduction
+[ ] Opening sentence or two on why this matters to the reader (how much study time actually pays off).
+[ ] Our question, stated clearly.
+[ ] Thesis: one sentence on what we found. Write it after running the tests. No words like p-value, test or confidence interval.
+Background
+[ ] Data source with link: UCI Student Performance dataset, collected by Paulo Cortez and Alice Silva from school reports and questionnaires at two Portuguese secondary schools.
+[ ] One row = one student's record in the Portuguese course. 649 students total.
+[ ] Explain studytime (self-reported weekly hours, categories 1 to 4) and G3 (final grade, 0 to 20 scale).
+[ ] Unusual factors: the G3 = 0 students, the small category 4, and that study time is self-reported.
+[ ] Graph: side-by-side boxplots of final grade for Lower vs. Higher, with a dot for each group's mean. Explain in 1 to 2 sentences what it shows.
+[ ] Small table: number of students and mean final grade per group.
+Statistical Analysis
+[ ] Define the parameters: μ_H and μ_L = population mean final grade for higher and lower study-time students.
+[ ] Name the method: Welch two-sample t-test.
+[ ] Check assumptions: independent students, large enough samples or roughly normal grades, and note category 4's small size.
+[ ] Hypotheses: H0: μ_H − μ_L = 0 vs. HA: μ_H − μ_L ≠ 0.
+[ ] Report the p-value and 95% confidence interval for the main test and the 1 vs. 4 test.
+[ ] No interpretation here. Save it for the Discussion.
+Discussion
+[ ] Explain the results in plain words (for example: "students who study more score about X points higher out of 20").
+[ ] Say this is an association, not proof that studying causes higher grades, since students chose how much to study.
+[ ] Weaknesses: self-reported study time, only two schools, small category 4, the zeros.
+[ ] One or two ideas for future research.
+Formatting
+[ ] Every chunk uses echo = FALSE, warning = FALSE, message = FALSE.
+[ ] No code, warnings or printed dataset in the HTML.
+[ ] Proofread for grammar. We can be graded on it.
