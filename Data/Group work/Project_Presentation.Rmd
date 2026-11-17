@@ -11,7 +11,16 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction
 
+# Background
 
+## Data Sources
+
+- This data comes directly from the findings of Cortez and Silva (2008). Looking at data from two Portuguese secondary schools, they show how grades in Mathematics and Portuguese differ based on levels of studying. They separate studying levels into 5 categories (1 being the "very good", 5 being the "insufficient"). They include many other regressors and controls in their data set, including age, sex, parent's education, extracurricular activities, health, and more. 
+
+## Variables
+Below are descriptions of the variables we will be using in our analysis:
+- studytime: Separated into 5 binary categories. 1 is the best level of studying, 5 is the worst. 
+- G3: Final grade, leveled 0-20
 
 Group 6 – Everything Due 11/30
 
