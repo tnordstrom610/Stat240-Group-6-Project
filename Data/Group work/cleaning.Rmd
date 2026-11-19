@@ -1,0 +1,42 @@
+---
+title: "data cleaning"
+output: html_document
+author: "Jed Lehrich, Tyler Nordstrom, Taylor Johnson, Mason Trinkner"
+date: "2026-11-19"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(tidyverse)
+```
+
+## Read the raw data
+
+```{r}
+por <- read.csv("student-por.csv", sep = ";")
+dim(por)
+```
+
+## keep only the variables we use
+
+we use study time (`studytime`, categories 1 to 4) and final grade (`G3`, 0 to 20).
+categories 1 and 2 (under 5 hours a week) are grouped as Lower, and 3 and 4 (5 or more hours) as higher
+
+```{r}
+por_clean <- por %>%
+  select(studytime, G3) %>%
+  mutate(study_group = case_when(
+    studytime %in% c(1, 2) ~ "Lower",
+    studytime %in% c(3, 4) ~ "Higher"
+  ))
+
+dim(por_clean)
+por_clean %>% count(studytime)
+por_clean %>% filter(G3 == 0) %>% count(study_group)
+```
+## Save the clean data
+
+```{r}
+write.csv(por_clean, "por_clean.csv", row.names = FALSE)
+```
+
